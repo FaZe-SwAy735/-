@@ -1,0 +1,125 @@
+import tkinter as tk
+from tkinter import messagebox
+
+
+def calculate_total():
+    try:
+        fuel_expense = float(expenses1.get())
+        food_expense = float(expenses2.get())
+        accommodation_expense = float(expenses3.get())
+        if fuel_expense <= 0 or food_expense <= 0 or accommodation_expense <= 0:
+            messagebox.showinfo('ОШИБКА', 'Введённые значения должны быть положительными')
+        else:
+            total = (fuel_expense * 63) + food_expense + (accommodation_expense * 0.0116666666666667)
+            total = round(total, 3)
+            result_label.config(text=f'Общие расходы: {total} ₽', fg="green")
+    except ValueError:
+        messagebox.showinfo('ОШИБКА', 'Введите числовое значение')
+
+def clear_entries():
+    expenses1.set("")
+    expenses2.set("")
+    expenses3.set("")
+    result_label.config(text="", fg="white")
+
+def validate_input():
+    if not all([expenses1.get(), expenses2.get(), expenses3.get()]):
+        messagebox.showinfo('ОШИБКА', 'Все поля должны быть заполнены')
+    else:
+        calculate_total()
+
+def clear_input():
+    if not all([expenses1.get(), expenses2.get(), expenses3.get()]):
+        messagebox.showinfo('ОШИБКА', 'Поля должны быть заполнены')
+    else:
+        clear_entries()
+
+def calculate_avg_per_distance(distance):
+    try:
+        fuel_expense_input = float(expenses1.get())
+        if fuel_expense_input <= 0 or distance <= 0:
+            messagebox.showinfo('ОШИБКА', 'Расход и пробег должны быть положительными')
+        else:
+            avg_expense_per_distance = fuel_expense_input / distance
+            avg_expense_per_distance = round(avg_expense_per_distance, 3)
+            result_label.config(text=f'Средний расход на километр/милю: {avg_expense_per_distance} л/км', fg="green")
+    except ValueError:
+        messagebox.showinfo('ОШИБКА', 'Введите числовое значение')
+
+expenses_history = []
+
+def add_to_history():
+    fuel_expense = float(expenses1.get())
+    food_expense = float(expenses2.get())
+    accommodation_expense = float(expenses3.get())
+    total = (fuel_expense * 63) + food_expense + (accommodation_expense * 0.0116666666666667)
+    expenses_history.append((fuel_expense,
+                             food_expense,
+                             accommodation_expense,
+                             total))
+
+def view_history():
+    history = "\n".join([f"Топливо: {item[0]}, Еда: {item[1]}, Кислород: {item[2]}, Общее: {item[3]}" for item in expenses_history])
+    messagebox.showinfo('История расходов', history)
+
+root = tk.Tk()
+root.title("Подсчет расходов")
+root.geometry("650x400")
+root["bg"] = "#000000"
+
+add_to_history_button = tk.Button(root, text="Добавить в историю", command=add_to_history, bg='black', fg='white', activebackground='white',
+font=("Helvetica", 10, "bold"))
+add_to_history_button.pack()
+
+view_history_button = tk.Button(root, text="Просмотреть историю расходов", command=view_history, bg='black', fg='white', activebackground='white',
+font=("Helvetica", 10, "bold"))
+view_history_button.pack()
+
+distance_label = tk.Label(root, text="Пробег (км/мили):", bg='black', fg="white", font=("Helvetica", 10, "bold"))
+distance_label.pack()
+distance_entry = tk.Entry(root)
+distance_entry.pack()
+
+check_avg_button = tk.Button(root, text="Рассчитать ср. расход", command=lambda: calculate_avg_per_distance(float(distance_entry.get())),
+bg='black', fg='white', activebackground='white', font=("Helvetica", 10, "bold"))
+check_avg_button.pack()
+
+title_label = tk.Label(root, text="Подсчет общих расходов", bg='black', fg="white", font=("Helvetica", 16, "bold"))
+title_label.pack()
+
+separator1 = tk.Frame(root, height=2, bd=1, relief=tk.SUNKEN)
+separator1.pack(fill=tk.X, padx=5, pady=5)
+
+expenses1_label = tk.Label(root, text="Расходы на топливо (литры):", bg='black', fg="white", font=("Helvetica", 10, "bold"))
+expenses1_label.pack()
+expenses1 = tk.StringVar()
+expenses1_entry = tk.Entry(root, textvariable=expenses1)
+expenses1_entry.pack()
+
+expenses2_label = tk.Label(root, text="Расходы на еду и воду (рубли):", bg='black', fg="white", font=("Helvetica", 10, "bold"))
+expenses2_label.pack()
+expenses2 = tk.StringVar()
+expenses2_entry = tk.Entry(root, textvariable=expenses2)
+expenses2_entry.pack()
+
+expenses3_label = tk.Label(root, text="Расходы на кислород (кубометры):", bg='black', fg="white", font=("Helvetica", 10, "bold"))
+expenses3_label.pack()
+expenses3 = tk.StringVar()
+expenses3_entry = tk.Entry(root, textvariable=expenses3)
+expenses3_entry.pack()
+
+separator2 = tk.Frame(root, height=2, bd=1, relief=tk.SUNKEN)
+separator2.pack(fill=tk.X, padx=5, pady=5)
+
+check_button = tk.Button(root, text="Проверить ввод", command=validate_input, bg='black', fg='white',
+activebackground='white', font=("Helvetica", 10, "bold"))
+check_button.pack()
+
+clear_button = tk.Button(root, text="Сбросить", command=clear_input, bg='black', fg='white', activebackground='white',
+font=("Helvetica", 10, "bold"))
+clear_button.pack()
+
+result_label = tk.Label(root, text="", fg="white", bg='black', font=("Helvetica", 12, "bold"))
+result_label.pack()
+
+root.mainloop()
